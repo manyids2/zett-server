@@ -11,7 +11,8 @@ save quick notes
   - open main README.md
     - done
   - take quick note
-  - show cards as list
+    - done
+  - show notes as list, edit old
   - open some auxiliary files
   - set run scripts
   - search through cards

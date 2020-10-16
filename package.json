@@ -73,6 +73,10 @@
       {
         "command": "zett.openreadme",
         "title": "Opens README.md from currentsession"
+      },
+      {
+        "command": "zett.quicknote",
+        "title": "Takes quicknote with timestamp in currentsession"
       }
     ]
   }

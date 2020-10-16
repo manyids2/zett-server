@@ -3,6 +3,30 @@ import fs from 'fs';
 import mkdirp from 'mkdirp';
 import path from 'path';
 
+function timeStamp() {
+  let now = new Date();
+  let date = [now.getMonth() + 1, now.getDate(), now.getFullYear()].map((d) =>
+    d.toString().length === 1 ? '0' + d : d
+  );
+  let time = [now.getHours(), now.getMinutes(), now.getSeconds()].map((d) => (d.toString().length === 1 ? '0' + d : d));
+  return date.join('-') + ':' + time.join('-');
+}
+
+function doesExist(dirpath) {
+  try {
+    fs.statSync(dirpath);
+    return true;
+  } catch (err) {
+    return !(err && err.code === 'ENOENT');
+  }
+}
+
+function checkAndMakeDir(dirpath, channel) {
+  if (!doesExist(dirpath)) {
+    mkdirp.sync(dirpath);
+  }
+}
+
 export async function activate(context: ExtensionContext): Promise<void> {
   let { subscriptions } = context;
   const { nvim } = workspace;
@@ -38,12 +62,19 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   subscriptions.push(
     commands.registerCommand('zett.openreadme', async () => {
-      // TODO: assumes directory exists.
-      let stat = fs.statSync(sessiondir);
-      if (!stat || !stat.isDirectory()) {
-        mkdirp.sync(sessiondir);
-      }
+      checkAndMakeDir(sessiondir, channel);
       nvim.command(`e ${sessiondir}/README.md`, true);
+    })
+  );
+
+  subscriptions.push(
+    commands.registerCommand('zett.quicknote', async () => {
+      const notesdir: string = path.join(sessiondir, 'notes');
+      checkAndMakeDir(notesdir, channel);
+
+      const notesfile: string = path.join(notesdir, timeStamp());
+      channel.appendLine(`notesfile: ${notesfile}.md`);
+      nvim.command(`e ${notesfile}.md`, true);
     })
   );
 }
