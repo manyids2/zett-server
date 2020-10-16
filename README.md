@@ -6,8 +6,12 @@ save quick notes
   - detect currentsession
     - done
   - make config file
-  - show cards as list
+    - just add stuff in package.json
+    - done
   - open main README.md
+    - done
+  - take quick note
+  - show cards as list
   - open some auxiliary files
   - set run scripts
   - search through cards

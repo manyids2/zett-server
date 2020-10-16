@@ -1,37 +1,49 @@
 import { commands, CompleteResult, ExtensionContext, listManager, sources, events, workspace } from 'coc.nvim';
-import * as path from 'path';
-
-import { fsStat, fsWriteFile, fsReadFile, fsMkdir } from './fs';
-import DB from './db';
-import Bookmark from './commands';
+import fs from 'fs';
+import mkdirp from 'mkdirp';
+import path from 'path';
 
 export async function activate(context: ExtensionContext): Promise<void> {
-  const config = workspace.getConfiguration('zett');
-
-  const { subscriptions, storagePath } = context;
+  let { subscriptions } = context;
   const { nvim } = workspace;
+  const config = workspace.getConfiguration('zett');
+  const channel = workspace.createOutputChannel('zett');
+  // if (!config.enabled) return;
 
-  workspace.showMessage(storagePath);
-
-  const db = new DB(path.join(storagePath, 'zett.json'));
-  const bookmark = new Bookmark(nvim, db);
-
-  const stat = await fsStat(storagePath);
-  if (!stat?.isDirectory()) {
-    workspace.showMessage('waiting for fsMkdir');
-    await fsMkdir(storagePath);
+  function _get_currentsession() {
+    return fs.readFileSync(currentsessionfile).toString().trim();
   }
 
-  events.on(
-    'BufEnter',
-    async () => {
-      workspace.showMessage('waiting for refresh');
-      await bookmark.refresh();
-      workspace.showMessage('done refresh');
-    },
-    null,
-    subscriptions
+  // Get config variables.
+  const basedir: string = config.get<string>('basedir')!.toString();
+  const currentsessionfile: string = config.get<string>('currentsessionfile')!.toString();
+
+  let currentsession: string = _get_currentsession();
+  let sessiondir: string = path.join(basedir, currentsession);
+
+  // Log to output channel.
+  channel.appendLine(`zett.basedir: ${basedir}`);
+  channel.appendLine(`zett.currentsessionfile: ${currentsessionfile}`);
+  channel.appendLine(`zett.currentsession: ${currentsession}`);
+  channel.appendLine(`zett.sessiondir: ${sessiondir}`);
+
+  // Commands.
+  subscriptions.push(
+    commands.registerCommand('zett.currentsession', async () => {
+      currentsession = _get_currentsession();
+      channel.appendLine(`zett.currentsession: ${currentsession}`);
+      channel.appendLine(`zett.sessiondir: ${sessiondir}`);
+    })
   );
 
-  subscriptions.push(commands.registerCommand('zett-server.toggle', async () => await bookmark.toggle()));
+  subscriptions.push(
+    commands.registerCommand('zett.openreadme', async () => {
+      // TODO: assumes directory exists.
+      let stat = fs.statSync(sessiondir);
+      if (!stat || !stat.isDirectory()) {
+        mkdirp.sync(sessiondir);
+      }
+      nvim.command(`e ${sessiondir}/README.md`, true);
+    })
+  );
 }

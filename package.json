@@ -1,5 +1,5 @@
 {
-  "name": "zett-server",
+  "name": "zett",
   "version": "0.0.0-development",
   "description": "save quick notes",
   "author": "fthorde <manyids2@gmail.com>",
@@ -40,24 +40,39 @@
     "webpack-cli": "^3.3.12"
   },
   "activationEvents": [
-    "*"
+    "onLanguage:markdown",
+    "onCommand:zett.currentsession"
   ],
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "zett-server configuration",
+      "title": "zett configuration",
       "properties": {
-        "zett-server.enabled": {
+        "zett.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable zett-server extension"
+          "description": "Enable zett extension"
+        },
+        "zett.basedir": {
+          "type": "string",
+          "default": "/home/mukunar1/fd/sessions",
+          "description": "Dir to store sessions"
+        },
+        "zett.currentsessionfile": {
+          "type": "string",
+          "default": "/home/mukunar1/.config/idesession/currentsession",
+          "description": "File to store current session"
         }
       }
     },
     "commands": [
       {
-        "command": "zett-server.Command",
-        "title": "zett-server command title"
+        "command": "zett.currentsession",
+        "title": "Echoes currentsession"
+      },
+      {
+        "command": "zett.openreadme",
+        "title": "Opens README.md from currentsession"
       }
     ]
   }
