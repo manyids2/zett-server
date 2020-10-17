@@ -2,6 +2,7 @@ import { commands, CompleteResult, ExtensionContext, listManager, sources, event
 import fs from 'fs';
 import mkdirp from 'mkdirp';
 import path from 'path';
+import ZettList from './lists';
 
 function timeStamp() {
   let now = new Date();
@@ -38,10 +39,15 @@ export async function activate(context: ExtensionContext): Promise<void> {
     return fs.readFileSync(currentsessionfile).toString().trim();
   }
 
+  function _get_zettsessions(p) {
+    return fs.readdirSync(p).filter((f) => fs.statSync(path.join(p, f)).isDirectory());
+  }
+
   // Get config variables.
   const basedir: string = config.get<string>('basedir')!.toString();
   const currentsessionfile: string = config.get<string>('currentsessionfile')!.toString();
 
+  let zettsessions: string[] = _get_zettsessions(basedir);
   let currentsession: string = _get_currentsession();
   let sessiondir: string = path.join(basedir, currentsession);
 
@@ -50,6 +56,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   channel.appendLine(`zett.currentsessionfile: ${currentsessionfile}`);
   channel.appendLine(`zett.currentsession: ${currentsession}`);
   channel.appendLine(`zett.sessiondir: ${sessiondir}`);
+  channel.appendLine(`zett.zettsessions: ${zettsessions}`);
 
   // Commands.
   subscriptions.push(
@@ -77,4 +84,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
       nvim.command(`e ${notesfile}.md`, true);
     })
   );
+
+  subscriptions.push(
+    commands.registerCommand('zett.gotonotesdir', async () => {
+      const notesdir: string = path.join(sessiondir, 'notes');
+      checkAndMakeDir(notesdir, channel);
+      nvim.command(`cd ${notesdir}`, true);
+    })
+  );
+
+  subscriptions.push(listManager.registerList(new ZettList(nvim, zettsessions, basedir)));
 }

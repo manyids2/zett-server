@@ -77,6 +77,10 @@
       {
         "command": "zett.quicknote",
         "title": "Takes quicknote with timestamp in currentsession"
+      },
+      {
+        "command": "zett.gotonotesdir",
+        "title": "Go to currentsession quicknotes folder"
       }
     ]
   }
