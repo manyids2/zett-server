@@ -10,7 +10,7 @@ function timeStamp() {
     d.toString().length === 1 ? '0' + d : d
   );
   let time = [now.getHours(), now.getMinutes(), now.getSeconds()].map((d) => (d.toString().length === 1 ? '0' + d : d));
-  return date.join('-') + ':' + time.join('-');
+  return date.join('-') + '-' + time.join('-');
 }
 
 function doesExist(dirpath) {
@@ -87,6 +87,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   subscriptions.push(
     commands.registerCommand('zett.gotonotesdir', async () => {
+      const notesdir: string = path.join(sessiondir, 'notes');
+      checkAndMakeDir(notesdir, channel);
+      nvim.command(`cd ${notesdir}`, true);
+    })
+  );
+
+  subscriptions.push(
+    commands.registerCommand('zett.searchnotesdir', async () => {
       const notesdir: string = path.join(sessiondir, 'notes');
       checkAndMakeDir(notesdir, channel);
       nvim.command(`cd ${notesdir}`, true);

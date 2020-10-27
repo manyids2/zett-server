@@ -1,0 +1,5 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =3
+let g:netrw_dirhist_3='/home/mukunar1/fd/projects/lsp-server-1/coc-bookmark/src/util'
+let g:netrw_dirhist_2='/home/mukunar1/fd/projects/lsp-server-1/coc-bookmark/src'
+let g:netrw_dirhist_1='/home/mukunar1/fd/software/.fzf/doc'

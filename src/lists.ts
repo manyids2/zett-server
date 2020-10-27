@@ -12,6 +12,7 @@ export default class ZettList extends BasicList {
     super(nvim);
     this.basedir = basedir;
     this.sessions = sessions;
+    workspace.showMessage(`${sessions}`);
 
     this.addLocationActions();
 
@@ -20,16 +21,18 @@ export default class ZettList extends BasicList {
     });
   }
 
+
+
   public async loadItems(context: ListContext): Promise<ListItem[]> {
-    return [
-      {
-        label: this.sessions[0],
-        data: { name: `${this.basedir}/${this.sessions[0]}` },
-      },
-      {
-        label: this.sessions[1],
-        data: { name: `${this.basedir}/${this.sessions[1]}` },
-      },
-    ];
+    let items: ListItem[] = [];
+    const basedir: string = this.basedir;
+    const sessions: string[] = this.sessions;
+    sessions.forEach(function(element) {
+      items.push({
+        label: element,
+        data: { name: `${basedir}/${element}` },
+      });
+    });
+    return items;
   }
 }
